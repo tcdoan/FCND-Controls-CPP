@@ -19,21 +19,17 @@
 </p>
 
 <p align="center">
-<img src="animations/c1c.png" width="1000"/>
+<img src="animations/nn1.jpg" width="1000"/>
 </p>
 
 <p align="center">
-<img src="animations/nn1.png" width="1000"/>
+<img src="animations/nn2.jpg" width="1000"/>
 </p>
 
 <p align="center">
-<img src="animations/nn2.png" width="1000"/>
+<img src="animations/nn3.jpg" width="1000"/>
 </p>
 
 <p align="center">
-<img src="animations/nn3.png" width="1000"/>
-</p>
-
-<p align="center">
-<img src="animations/nn4.png" width="1000"/>
+<img src="animations/nn4.jpg" width="1000"/>
 </p>
