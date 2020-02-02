@@ -1,9 +1,10 @@
 # 3D Drone Controls 
 
-[video lectures ](https://www.youtube.com/playlist?list=PLNOpE0221wYIPqzDkwH61aslSyD8r7cRQ).
+[Video lectures](https://www.youtube.com/playlist?list=PLNOpE0221wYIPqzDkwH61aslSyD8r7cRQ)
 
-[Python code](https://github.com/tcdoan/self-driving-2/tree/master/3d_controllers). 
+[Python code](https://github.com/tcdoan/self-driving-2/tree/master/3d_controllers) 
 
+[Double Integrator Control: Cascaded P Controller Gains vs Damping Ratio](https://github.com/tcdoan/FCND-Controls-CPP/blob/master/Damping_Ratio.pdf)
 ## Drone Controller Diagrams
 
 <p align="center">
