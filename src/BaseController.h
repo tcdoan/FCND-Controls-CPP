@@ -19,7 +19,10 @@ public:
   virtual ~BaseController() {};
 
   virtual void RunEstimation() {};
-  virtual VehicleCommand RunControl(float dt, float sim_time) { return VehicleCommand(); };
+  virtual VehicleCommand RunControl(float dt, float sim_time) 
+  { 
+      return VehicleCommand(); 
+  };
 
   virtual void Init();
   virtual void Reset();

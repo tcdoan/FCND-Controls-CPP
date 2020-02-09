@@ -65,8 +65,8 @@ VehicleCommand QuadControl::GenerateMotorCommands(float collThrustCmd, V3F momen
   //   cmd.desiredThrustsN[0..3]: motor commands, in [N]
 
   // HINTS: 
-  // - you can access parts of momentCmd via e.g. momentCmd.x
-  // You'll need the arm length parameter L, and the drag/thrust ratio kappa
+  // - You can access parts of momentCmd via e.g. momentCmd.x
+  // - You'll need the arm length parameter L, and the drag/thrust ratio kappa
 
   ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
 

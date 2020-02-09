@@ -50,8 +50,8 @@ public:
 
   inline bool operator==(const V3D& b) const{ return (b.x==x && b.y==y && b.z==z);}
   inline bool operator!=(const V3D& b) const{ return (b.x!=x || b.y!=y || b.z!=z);}
-	inline bool operator>(const V3D& b) const{ return (b.x>x || b.y>y || b.z>z);}
-	inline bool operator<(const V3D& b) const{ return (b.x<x || b.y<y || b.z<z);}
+  inline bool operator>(const V3D& b) const{ return (b.x>x || b.y>y || b.z>z);}
+  inline bool operator<(const V3D& b) const{ return (b.x<x || b.y<y || b.z<z);}
 
   inline V3D operator/=(const V3D b){ *this = *this / b; return *this;}
   inline V3D operator*=(const V3D b){ *this = *this * b; return *this;}
