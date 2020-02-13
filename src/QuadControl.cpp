@@ -47,7 +47,7 @@ void QuadControl::Init()
   maxMotorThrust = config->Get(_config + ".maxMotorThrust", 100);
 #else
   // load params from PX4 parameter system
-  //TODO
+  // TODO
   param_get(param_find("MC_PITCH_P"), &Kp_bank);
   param_get(param_find("MC_YAW_P"), &Kp_yaw);
 #endif
@@ -68,14 +68,15 @@ VehicleCommand QuadControl::GenerateMotorCommands(float collThrustCmd, V3F momen
   // - You can access parts of momentCmd via e.g. momentCmd.x
   // - You'll need the arm length parameter L, and the drag/thrust ratio kappa
 
-  ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
+  float l = L / (2*sqrt(2));
+  float mx = momentCmd[0];
+  float my = momentCmd[1];
+  float mz = momentCmd[2];
 
-  cmd.desiredThrustsN[0] = mass * 9.81f / 4.f; // front left
-  cmd.desiredThrustsN[1] = mass * 9.81f / 4.f; // front right
-  cmd.desiredThrustsN[2] = mass * 9.81f / 4.f; // rear left
-  cmd.desiredThrustsN[3] = mass * 9.81f / 4.f; // rear right
-
-  /////////////////////////////// END STUDENT CODE ////////////////////////////
+  cmd.desiredThrustsN[0] = 0.25 * (collThrustCmd + (mx + my)/l - mz/kappa);
+  cmd.desiredThrustsN[1] = 0.25 * (collThrustCmd - (mx - my)/l + mz/kappa);
+  cmd.desiredThrustsN[2] = 0.25 * ((mx + my)/l + mz/kappa - collThrustCmd);
+  cmd.desiredThrustsN[3] = 0.25 * (collThrustCmd + mx/l - my/l + mz/kappa);
 
   return cmd;
 }
@@ -93,15 +94,10 @@ V3F QuadControl::BodyRateControl(V3F pqrCmd, V3F pqr)
   //  - you can use V3Fs just like scalars: V3F a(1,1,1), b(2,3,4), c; c=a-b;
   //  - you'll need parameters for moments of inertia Ixx, Iyy, Izz
   //  - you'll also need the gain parameter kpPQR (it's a V3F)
-
-  V3F momentCmd;
-
-  ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
-
-  
-
-  /////////////////////////////// END STUDENT CODE ////////////////////////////
-
+  V3F err = pqrCmd - pqr;
+  V3F pqr_dot = kpPQR * err;
+  V3F Ixyz(this->Ixx, this->Iyy, this->Izz);
+  V3F momentCmd = Ixyz * pqr_dot;
   return momentCmd;
 }
 
@@ -124,15 +120,12 @@ V3F QuadControl::RollPitchControl(V3F accelCmd, Quaternion<float> attitude, floa
   //  - you'll need the roll/pitch gain kpBank
   //  - collThrustCmd is a force in Newtons! You'll likely want to convert it to acceleration first
 
-  V3F pqrCmd;
   Mat3x3F R = attitude.RotationMatrix_IwrtB();
-
-  ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
-
-
-
-  /////////////////////////////// END STUDENT CODE ////////////////////////////
-
+  float bxc = this->mass * accelCmd[0] / collThrustCmd;
+  float byc = this->mass * accelCmd[1] / collThrustCmd;
+  float pc = (R(1, 0) * bxc - R(0, 0) * byc) / R(2, 2);
+  float qc = (R(1, 1) * bxc - R(0, 1) * byc) / R(2, 2);
+  V3F pqrCmd(pc, qc, 0.0);
   return pqrCmd;
 }
 

@@ -127,7 +127,7 @@ public:
 
 	static Mat3x3F SkewSymmetric(const V3F& w){return Mat3x3F::SkewSymmetric(w.x,w.y,w.z);}
 
-	static Mat3x3F OuterProduct(const V3F a, const V3F b)//a^T*b
+	static Mat3x3F OuterProduct(const V3F a, const V3F b) //a^T*b
 	{
 		float v[9];
 		v[0] = a.x*b.x;

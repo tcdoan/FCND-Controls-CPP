@@ -24,7 +24,10 @@ public:
 
   FixedQueue<TrajectoryPoint> traj; // vector containing the trajectory points
 
-  int GetCurTrajectoryPoint() const { return _curTrajPoint; }
+  int GetCurTrajectoryPoint() const 
+  { 
+      return _curTrajPoint; 
+  }
 private:
   string _log_filename;
   FILE* _log_file;
