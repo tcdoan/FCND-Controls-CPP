@@ -75,8 +75,8 @@ VehicleCommand QuadControl::GenerateMotorCommands(float collThrustCmd, V3F momen
 
   cmd.desiredThrustsN[0] = 0.25 * (collThrustCmd + (mx + my)/l - mz/kappa);
   cmd.desiredThrustsN[1] = 0.25 * (collThrustCmd - (mx - my)/l + mz/kappa);
-  cmd.desiredThrustsN[2] = 0.25 * ((mx + my)/l + mz/kappa - collThrustCmd);
-  cmd.desiredThrustsN[3] = 0.25 * (collThrustCmd + mx/l - my/l + mz/kappa);
+  cmd.desiredThrustsN[3] = 0.25 * (collThrustCmd - (mx + my)/l + mz/kappa);
+  cmd.desiredThrustsN[2] = 0.25 * (collThrustCmd + (mx - my)/l + mz/kappa);
 
   return cmd;
 }
@@ -121,10 +121,16 @@ V3F QuadControl::RollPitchControl(V3F accelCmd, Quaternion<float> attitude, floa
   //  - collThrustCmd is a force in Newtons! You'll likely want to convert it to acceleration first
 
   Mat3x3F R = attitude.RotationMatrix_IwrtB();
-  float bxc = this->mass * accelCmd[0] / collThrustCmd;
-  float byc = this->mass * accelCmd[1] / collThrustCmd;
-  float pc = (R(1, 0) * bxc - R(0, 0) * byc) / R(2, 2);
-  float qc = (R(1, 1) * bxc - R(0, 1) * byc) / R(2, 2);
+
+  float bxc = CONSTRAIN(this->mass * accelCmd[0] / collThrustCmd, -maxTiltAngle, maxTiltAngle);
+  float byc = CONSTRAIN(this->mass * accelCmd[1] / collThrustCmd, - maxTiltAngle, maxTiltAngle);
+
+  float bxdot = this->kpBank * (bxc - R(0, 2));
+  float bydot = this->kpBank * (byc - R(1, 2));
+
+  float pc = (R(1, 0) * bxdot - R(0, 0) * bydot) / R(2, 2);
+  float qc = (R(1, 1) * bxdot - R(0, 1) * bydot) / R(2, 2);
+
   V3F pqrCmd(pc, qc, 0.0);
   return pqrCmd;
 }
