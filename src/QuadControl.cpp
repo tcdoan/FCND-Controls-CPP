@@ -69,9 +69,9 @@ VehicleCommand QuadControl::GenerateMotorCommands(float collThrustCmd, V3F momen
   // - You'll need the arm length parameter L, and the drag/thrust ratio kappa
 
   float l = L / (2*sqrt(2));
-  float mx = momentCmd[0];
-  float my = momentCmd[1];
-  float mz = momentCmd[2];
+  float mx = momentCmd.x;
+  float my = momentCmd.y;
+  float mz = momentCmd.z;
 
   cmd.desiredThrustsN[0] = 0.25 * (collThrustCmd + (mx + my)/l - mz/kappa);
   cmd.desiredThrustsN[1] = 0.25 * (collThrustCmd - (mx - my)/l + mz/kappa);
@@ -123,7 +123,7 @@ V3F QuadControl::RollPitchControl(V3F accelCmd, Quaternion<float> attitude, floa
   Mat3x3F R = attitude.RotationMatrix_IwrtB();
 
   float bxc = CONSTRAIN(this->mass * accelCmd[0] / collThrustCmd, -maxTiltAngle, maxTiltAngle);
-  float byc = CONSTRAIN(this->mass * accelCmd[1] / collThrustCmd, - maxTiltAngle, maxTiltAngle);
+  float byc = CONSTRAIN(this->mass * accelCmd[1] / collThrustCmd, -maxTiltAngle, maxTiltAngle);
 
   float bxdot = this->kpBank * (bxc - R(0, 2));
   float bydot = this->kpBank * (byc - R(1, 2));
@@ -158,11 +158,6 @@ float QuadControl::AltitudeControl(float posZCmd, float velZCmd, float posZ, flo
   Mat3x3F R = attitude.RotationMatrix_IwrtB();
   float thrust = 0;
 
-  ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
-
-
-
-  /////////////////////////////// END STUDENT CODE ////////////////////////////
   
   return thrust;
 }
