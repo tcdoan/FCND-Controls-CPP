@@ -157,8 +157,9 @@ float QuadControl::AltitudeControl(float posZCmd, float velZCmd, float posZ, flo
 
   Mat3x3F R = attitude.RotationMatrix_IwrtB();
   float thrust = 0;
-
-  
+  float zVelCtl = CONSTRAIN(kpPosZ * (posZCmd - posZ) + velZCmd, -maxAscentRate, maxDescentRate);
+  float zdotzot = kpVelZ * (zVelCtl - velZ) + accelZCmd;
+  thrust = this->mass * (9.81 - zdotzot) / R(2, 2);
   return thrust;
 }
 
@@ -186,17 +187,16 @@ V3F QuadControl::LateralPositionControl(V3F posCmd, V3F velCmd, V3F pos, V3F vel
   velCmd.z = 0;
   posCmd.z = pos.z;
 
+  // Commanded velocities 
+  V3F ctlVelCmd = this->kpPosXY * (posCmd - pos) + velCmd;
+  ctlVelCmd.x = CONSTRAIN(ctlVelCmd.x, -maxSpeedXY, maxSpeedXY);
+  ctlVelCmd.y = CONSTRAIN(ctlVelCmd.y, -maxSpeedXY, maxSpeedXY);
+
   // we initialize the returned desired acceleration to the feed-forward value.
   // Make sure to _add_, not simply replace, the result of your controller
   // to this variable
   V3F accelCmd = accelCmdFF;
-
-  ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
-
-  
-
-  /////////////////////////////// END STUDENT CODE ////////////////////////////
-
+  accelCmd = accelCmd + kpVelXY * (ctlVelCmd - vel);
   return accelCmd;
 }
 
@@ -214,13 +214,8 @@ float QuadControl::YawControl(float yawCmd, float yaw)
   //  - use the yaw control gain parameter kpYaw
 
   float yawRateCmd=0;
-  ////////////////////////////// BEGIN STUDENT CODE ///////////////////////////
-
-
-  /////////////////////////////// END STUDENT CODE ////////////////////////////
-
+  yawRateCmd = this->kpYaw * (yawCmd - yaw);
   return yawRateCmd;
-
 }
 
 VehicleCommand QuadControl::RunControl(float dt, float simTime)
