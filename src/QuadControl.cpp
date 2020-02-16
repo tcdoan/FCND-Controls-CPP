@@ -18,16 +18,16 @@ void QuadControl::Init()
 
   // variables needed for integral control
   integratedAltitudeError = 0;
-    
+
 #ifndef __PX4_NUTTX
   // Load params from simulator parameter system
   ParamsHandle config = SimpleConfig::GetInstance();
-   
+
   // Load parameters (default to 0)
-  kpPosXY = config->Get(_config+".kpPosXY", 0);
+  kpPosXY = config->Get(_config + ".kpPosXY", 0);
   kpPosZ = config->Get(_config + ".kpPosZ", 0);
   KiPosZ = config->Get(_config + ".KiPosZ", 0);
-     
+
   kpVelXY = config->Get(_config + ".kpVelXY", 0);
   kpVelZ = config->Get(_config + ".kpVelZ", 0);
 
@@ -65,8 +65,8 @@ VehicleCommand QuadControl::GenerateMotorCommands(float collThrustCmd, V3F momen
   //   cmd.desiredThrustsN[0..3]: motor commands, in [N]
 
   // HINTS: 
-  // - You can access parts of momentCmd via e.g. momentCmd.x
-  // - You'll need the arm length parameter L, and the drag/thrust ratio kappa
+  // - you can access parts of momentCmd via e.g. momentCmd.x
+  // You'll need the arm length parameter L, and the drag/thrust ratio kappa
 
   float l = L / (2*sqrt(2));
   float mx = momentCmd.x;
@@ -121,9 +121,9 @@ V3F QuadControl::RollPitchControl(V3F accelCmd, Quaternion<float> attitude, floa
   //  - collThrustCmd is a force in Newtons! You'll likely want to convert it to acceleration first
 
   Mat3x3F R = attitude.RotationMatrix_IwrtB();
-
-  float bxc = CONSTRAIN(this->mass * accelCmd[0] / collThrustCmd, -maxTiltAngle, maxTiltAngle);
-  float byc = CONSTRAIN(this->mass * accelCmd[1] / collThrustCmd, -maxTiltAngle, maxTiltAngle);
+  
+  float bxc = -CONSTRAIN(this->mass * accelCmd[0] / collThrustCmd, -maxTiltAngle, maxTiltAngle);
+  float byc = -CONSTRAIN(this->mass * accelCmd[1] / collThrustCmd, -maxTiltAngle, maxTiltAngle);
 
   float bxdot = this->kpBank * (bxc - R(0, 2));
   float bydot = this->kpBank * (byc - R(1, 2));
@@ -160,6 +160,7 @@ float QuadControl::AltitudeControl(float posZCmd, float velZCmd, float posZ, flo
   float zVelCtl = CONSTRAIN(kpPosZ * (posZCmd - posZ) + velZCmd, -maxAscentRate, maxDescentRate);
   float zdotzot = kpVelZ * (zVelCtl - velZ) + accelZCmd;
   thrust = this->mass * (9.81 - zdotzot) / R(2, 2);
+
   return thrust;
 }
 
@@ -197,6 +198,7 @@ V3F QuadControl::LateralPositionControl(V3F posCmd, V3F velCmd, V3F pos, V3F vel
   // to this variable
   V3F accelCmd = accelCmdFF;
   accelCmd = accelCmd + kpVelXY * (ctlVelCmd - vel);
+
   return accelCmd;
 }
 
@@ -213,7 +215,7 @@ float QuadControl::YawControl(float yawCmd, float yaw)
   //  - use fmodf(foo,b) to unwrap a radian angle measure float foo to range [0,b]. 
   //  - use the yaw control gain parameter kpYaw
 
-  float yawRateCmd=0;
+  float yawRateCmd = 0;
   yawRateCmd = this->kpYaw * (yawCmd - yaw);
   return yawRateCmd;
 }
@@ -227,9 +229,9 @@ VehicleCommand QuadControl::RunControl(float dt, float simTime)
   // reserve some thrust margin for angle control
   float thrustMargin = .1f*(maxMotorThrust - minMotorThrust);
   collThrustCmd = CONSTRAIN(collThrustCmd, (minMotorThrust+ thrustMargin)*4.f, (maxMotorThrust-thrustMargin)*4.f);
-  
+
   V3F desAcc = LateralPositionControl(curTrajPoint.position, curTrajPoint.velocity, estPos, estVel, curTrajPoint.accel);
-  
+
   V3F desOmega = RollPitchControl(desAcc, estAtt, collThrustCmd);
   desOmega.z = YawControl(curTrajPoint.attitude.Yaw(), estAtt.Yaw());
 
